@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2050: Letters from the Future | Tensor Titans</title>
+    <!-- FontAwesome for UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#101B2D',
+                        teal: '#123F46',
+                        cyan: '#62D6D6',
+                        green: '#79B879',
+                        mint: '#C6E8D0',
+                        cream: '#F4F0E5'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            background-color: #101B2D;
+            color: #F4F0E5;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #123F46 0%, #0d2e33 100%);
+            border: 2px solid #62D6D6;
+            color: #62D6D6;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px rgba(98, 214, 214, 0.15);
+        }
+        .btn-primary:hover {
+            background: #62D6D6;
+            color: #101B2D;
+            box-shadow: 0 6px 20px rgba(98, 214, 214, 0.4);
+            transform: translateY(-2px);
+        }
+        .glass-card {
+            background: rgba(18, 63, 70, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(98, 214, 214, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glow-text {
+            text-shadow: 0 0 12px rgba(98, 214, 214, 0.6);
+        }
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101B2D;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #123F46;
+            border-radius: 4px;
+            border: 1px solid #62D6D6;
+        }
+        /* Animations */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .pulse-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .floating {
+            animation: floatAnim 4s ease-in-out infinite;
+        }
+        /* Custom Drag Targets */
+        .drag-hover {
+            border-color: #62D6D6 !important;
+            background: rgba(98, 214, 214, 0.2) !important;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center p-2 sm:p-4 bg-navy relative">
+
+    <!-- Global Sound Bar -->
+    <div class="fixed top-4 right-4 z-50 flex items-center gap-3 bg-navy/80 border border-cyan/30 rounded-full px-4 py-2 backdrop-blur-md shadow-lg">
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="text-cyan hover:text-mint transition-colors text-lg focus:outline-none" title="Toggle Sound">
+            <i id="soundIcon" class="fas fa-volume-up"></i>
+        </button>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5" oninput="adjustVolume(this.value)" class="w-16 sm:w-24 accent-cyan cursor-pointer">
+    </div>
+
+    <!-- MAIN GAME CONTAINER FRAME -->
+    <div id="gameViewport" class="relative w-full max-w-5xl h-[92vh] max-h-[750px] bg-navy rounded-2xl border-2 border-cyan/40 shadow-2xl flex flex-col overflow-hidden">
+
+        <!-- ================= SCREEN 1: TITLE SCREEN ================= -->
+        <div id="screen1" class="screen absolute inset-0 flex flex-col justify-between p-6 sm:p-10 z-10">
+            <canvas id="titleBgCanvas" class="absolute inset-0 w-full h-full -z-10"></canvas>
+
+            <div class="flex justify-between items-start pt-2">
+                <div>
+                    <span class="inline-block px-3 py-1 bg-teal/60 border border-cyan/40 text-cyan text-xs font-mono rounded-full tracking-wider mb-2">DEVELOPMENT TEAM</span>
+                    <h2 class="text-xl font-extrabold tracking-widest text-mint font-mono">TENSOR TITANS</h2>
+                </div>
+                <div class="text-right">
+                    <span class="px-3 py-1 bg-green/20 border border-green/40 text-mint text-xs rounded-full"><i class="fas fa-leaf mr-1"></i> SDG 13 CHAMPION</span>
+                </div>
+            </div>
+
+            <div class="text-center my-auto">
+                <h1 class="text-4xl sm:text-6xl font-black text-cream glow-text tracking-tight uppercase leading-none mb-3">
+                    2050: <span class="text-cyan">Letters from the Future</span>
+                </h1>
+                <p class="text-mint/80 max-w-xl mx-auto text-sm sm:text-base font-light">
+                    An interactive environmental journey bridging time to restore our world's lifeblood.
+                </p>
+                <div class="mt-8">
+                    <button onclick="goToScreen(2)" class="btn-primary text-lg font-bold px-8 py-3 rounded-full uppercase tracking-wider inline-flex items-center gap-2 group">
+                        <span>Begin Journey</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center text-xs text-mint/50 font-mono">
+                Team: Tensor Titans • SDG 13, 6, 11, 15 Interactive Simulation
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 2: SUSTAINABLE DEVELOPMENT GOALS ================= -->
+        <div id="screen2" class="screen absolute inset-0 hidden flex-col p-6 sm:p-10 z-10 overflow-y-auto bg-navy/95">
+            <div class="text-center mb-6">
+                <span class="text-cyan font-mono text-xs uppercase tracking-widest">Global Framework</span>
+                <h2 class="text-3xl font-extrabold text-cream mt-1">Sustainable Development Goals</h2>
+                <p class="text-mint/70 text-sm max-w-md mx-auto">Your actions directly impact these global goals for a sustainable world.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-auto max-w-3xl mx-auto w-full">
+                <!-- Primary SDG -->
+                <div class="glass-card p-4 rounded-xl border-l-4 border-l-green flex gap-4 items-start col-span-1 sm:col-span-2 bg-teal/30">
+                    <div class="w-12 h-12 rounded-lg bg-green/20 border border-green text-green flex items-center justify-center text-2xl shrink-0 font-bold">13</div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-bold text-cream text-base">SDG 13 — Climate Action</h3>
+                            <span class="text-[10px] bg-green/30 text-mint border border-green/40 px-2 py-0.5 rounded uppercase font-mono">Primary Focus</span>
+                        </div>
+                        <p class="text-xs text-mint/80 mt-1">Take urgent action to combat climate change and its impacts through community level interventions and systemic habits.</p>
+                    </div>
+                </div>
+
+                <!-- SDG 6 -->
+                <div class="glass-card p-4 rounded-xl border-l-4 border-l-cyan flex gap-4 items-start">
+                    <div class="w-10 h-10 rounded-lg bg-cyan/20 border border-cyan text-cyan flex items-center justify-center text-xl shrink-0 font-bold">6</div>
+                    <div>
+                        <h3 class="font-bold text-cream text-sm">SDG 6 — Clean Water</h3>
+                        <p class="text-xs text-mint/70 mt-1">Ensure availability and sustainable management of water and sanitation by protecting rivers & unblocking drainage systems.</p>
+                    </div>
+                </div>
+
+                <!-- SDG 11 -->
+                <div class="glass-card p-4 rounded-xl border-l-4 border-l-yellow-500 flex gap-4 items-start">
+                    <div class="w-10 h-10 rounded-lg bg-yellow-500/20 border border-yellow-500 text-yellow-300 flex items-center justify-center text-xl shrink-0 font-bold">11</div>
+                    <div>
+                        <h3 class="font-bold text-cream text-sm">SDG 11 — Sustainable Cities</h3>
+                        <p class="text-xs text-mint/70 mt-1">Make cities inclusive, safe, resilient, and sustainable through proper waste management and eco-transportation.</p>
+                    </div>
+                </div>
+
+                <!-- SDG 15 -->
+                <div class="glass-card p-4 rounded-xl border-l-4 border-l-emerald-500 flex gap-4 items-start col-span-1 sm:col-span-2">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-500/20 border border-emerald-500 text-emerald-300 flex items-center justify-center text-xl shrink-0 font-bold">15</div>
+                    <div>
+                        <h3 class="font-bold text-cream text-sm">SDG 15 — Life on Land</h3>
+                        <p class="text-xs text-mint/70 mt-1">Protect, restore, and promote sustainable use of terrestrial ecosystems by actively planting trees and restoring urban greenery.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center pt-4 mt-auto">
+                <button onclick="goToScreen(3)" class="btn-primary font-bold px-8 py-3 rounded-full uppercase tracking-wider text-sm inline-flex items-center gap-2">
+                    <span>Continue</span>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 3: PLAYER NAME ENTRY ================= -->
+        <div id="screen3" class="screen absolute inset-0 hidden flex-col justify-center items-center p-6 sm:p-10 z-10 bg-navy/95">
+            <div class="glass-card max-w-md w-full p-8 rounded-2xl text-center border border-cyan/40 shadow-2xl relative overflow-hidden">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-teal/60 border border-cyan text-cyan flex items-center justify-center text-2xl floating">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-cream mb-1">WHO WILL WRITE THE FUTURE?</h2>
+                <p class="text-xs sm:text-sm text-mint/70 mb-6">Enter your name to link your timeline with Jennifer in 2050.</p>
+
+                <form onsubmit="handleNameSubmit(event)" class="space-y-4">
+                    <div class="relative">
+                        <input type="text" id="playerNameInput" maxlength="20" placeholder="Enter your name..." required class="w-full bg-navy/80 border-2 border-cyan/40 rounded-xl px-4 py-3 text-cream text-center text-lg focus:outline-none focus:border-cyan placeholder:text-mint/30 font-bold transition-all">
+                        <div id="nameError" class="text-xs text-red-400 mt-1 hidden">Please enter a valid name to proceed.</div>
+                    </div>
+                    <button type="submit" class="w-full btn-primary font-bold py-3 rounded-xl uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+                        <span>Initialize Transmission</span>
+                        <i class="fas fa-satellite-dish"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 4: JENNIFER'S FIRST LETTER ================= -->
+        <div id="screen4" class="screen absolute inset-0 hidden flex-col p-6 sm:p-10 z-10 bg-navy/95 overflow-y-auto">
+            <div class="max-w-2xl mx-auto my-auto w-full">
+                <!-- Holographic Header -->
+                <div class="flex items-center justify-between border-b border-cyan/30 pb-3 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-cyan animate-ping"></div>
+                        <span class="text-xs font-mono text-cyan uppercase tracking-wider">INCOMING TIMELINE TRANSMISSION // 2050 A.D.</span>
+                    </div>
+                    <span class="text-xs font-mono text-mint/50">TIME: 04:42 AM</span>
+                </div>
+
+                <!-- Letter Card -->
+                <div class="glass-card p-6 sm:p-8 rounded-2xl relative border-cyan/30 text-cream leading-relaxed space-y-4 shadow-2xl">
+                    <div class="absolute -top-3 right-6 bg-cyan text-navy font-bold font-mono text-[10px] px-3 py-0.5 rounded-full uppercase">
+                        Sender: Jennifer
+                    </div>
+
+                    <p class="text-sm sm:text-base italic text-cyan/90 font-mono">
+                        "To <span class="playerNameSpan font-bold text-cream">Traveler</span> in the past..."
+                    </p>
+
+                    <p class="text-xs sm:text-sm text-mint/90 leading-relaxed">
+                        I am writing to you from the year 2050 beside the arched bridge near our home—the same spot where you and your siblings used to spend your childhood summers listening to the flowing water.
+                    </p>
+
+                    <p class="text-xs sm:text-sm text-mint/90 leading-relaxed">
+                        In my present, this river is nearly gone. Years of environmental neglect, clogged storm drains, heavy plastic pollution, and lost greenery have choked the riverbanks into a desolate wasteland. The water is murky, the air is heavy, and the trees we once loved exist only in old photographs.
+                    </p>
+
+                    <p class="text-xs sm:text-sm text-mint/90 leading-relaxed">
+                        I found an old community archive with your timeline address. I believe people in your time still have an opportunity to make different choices. If you take action today across key local environmental missions, you can rewrite my present. Please... help us restore the river.
+                    </p>
+
+                    <div class="pt-4 border-t border-cyan/20 flex justify-between items-center text-xs font-mono text-cyan">
+                        <span>PRIORITY: HIGH</span>
+                        <span>STATUS: AWAITING ACTION</span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-6">
+                    <button onclick="goToScreen(5)" class="btn-primary font-bold px-8 py-3 rounded-full uppercase tracking-wider text-sm inline-flex items-center gap-2">
+                        <span>Open Mission Board</span>
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 5: MISSION SELECTION BOARD ================= -->
+        <div id="screen5" class="screen absolute inset-0 hidden flex-col p-4 sm:p-8 z-10 bg-navy/95 overflow-y-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 mb-6 pb-3 border-b border-cyan/30">
+                <div>
+                    <span class="text-xs font-mono text-cyan uppercase tracking-wider">TIMELINE INTERVENTION DASHBOARD</span>
+                    <h2 class="text-2xl font-extrabold text-cream">Environmental Missions</h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="glass-card px-4 py-2 rounded-xl text-center">
+                        <span class="text-[10px] text-mint/60 block font-mono uppercase">Completed</span>
+                        <span id="missionProgressText" class="text-lg font-bold text-cyan font-mono">0 / 4 Required</span>
+                    </div>
+                    <div class="glass-card px-4 py-2 rounded-xl text-center">
+                        <span class="text-[10px] text-mint/60 block font-mono uppercase">Eco Points</span>
+                        <span id="playerPointsText" class="text-lg font-bold text-green font-mono">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-xs text-mint/80 mb-4">Complete at least <strong class="text-cyan">4 distinct missions</strong> out of 5 to alter Jennifer's timeline and unlock her 2nd letter.</p>
+
+            <!-- Mission Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <!-- Mission 1 Card -->
+                <div class="glass-card rounded-xl p-4 flex flex-col justify-between border-cyan/30 hover:border-cyan transition-all relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-cyan/80 bg-cyan/10 px-2.5 py-1 rounded-full border border-cyan/20">SDG 13 & 6</span>
+                            <span id="m1Badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">PENDING</span>
+                        </div>
+                        <h3 class="font-bold text-cream text-base mb-1">1. River Restoration</h3>
+                        <p class="text-xs text-mint/70 mb-4">Remove plastic bags, bottles, and debris to restore water clarity and health.</p>
+                    </div>
+                    <button onclick="launchMission(1)" class="w-full btn-primary py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Launch Mission</button>
+                </div>
+
+                <!-- Mission 2 Card -->
+                <div class="glass-card rounded-xl p-4 flex flex-col justify-between border-cyan/30 hover:border-cyan transition-all relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-cyan/80 bg-cyan/10 px-2.5 py-1 rounded-full border border-cyan/20">SDG 11 & 6</span>
+                            <span id="m2Badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">PENDING</span>
+                        </div>
+                        <h3 class="font-bold text-cream text-base mb-1">2. Drain Unclogging</h3>
+                        <p class="text-xs text-mint/70 mb-4">Clear mud, leaves, and trash blocking storm drains to prevent urban flooding.</p>
+                    </div>
+                    <button onclick="launchMission(2)" class="w-full btn-primary py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Launch Mission</button>
+                </div>
+
+                <!-- Mission 3 Card -->
+                <div class="glass-card rounded-xl p-4 flex flex-col justify-between border-cyan/30 hover:border-cyan transition-all relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-cyan/80 bg-cyan/10 px-2.5 py-1 rounded-full border border-cyan/20">SDG 13 & 15</span>
+                            <span id="m3Badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">PENDING</span>
+                        </div>
+                        <h3 class="font-bold text-cream text-base mb-1">3. Tree Planting & Growth</h3>
+                        <p class="text-xs text-mint/70 mb-4">Dig, plant saplings, and water 5 spots to reforest the local riverbank garden.</p>
+                    </div>
+                    <button onclick="launchMission(3)" class="w-full btn-primary py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Launch Mission</button>
+                </div>
+
+                <!-- Mission 4 Card -->
+                <div class="glass-card rounded-xl p-4 flex flex-col justify-between border-cyan/30 hover:border-cyan transition-all relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-cyan/80 bg-cyan/10 px-2.5 py-1 rounded-full border border-cyan/20">SDG 11 & 13</span>
+                            <span id="m4Badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">PENDING</span>
+                        </div>
+                        <h3 class="font-bold text-cream text-base mb-1">4. Waste Classification</h3>
+                        <p class="text-xs text-mint/70 mb-4">Sort paper, plastic, glass/metal, and organic waste into correct recycling bins.</p>
+                    </div>
+                    <button onclick="launchMission(4)" class="w-full btn-primary py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Launch Mission</button>
+                </div>
+
+                <!-- Mission 5 Card -->
+                <div class="glass-card rounded-xl p-4 flex flex-col justify-between border-cyan/30 hover:border-cyan transition-all relative overflow-hidden group">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-cyan/80 bg-cyan/10 px-2.5 py-1 rounded-full border border-cyan/20">SDG 13 & 11</span>
+                            <span id="m5Badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">PENDING</span>
+                        </div>
+                        <h3 class="font-bold text-cream text-base mb-1">5. Sustainable Transit</h3>
+                        <p class="text-xs text-mint/70 mb-4">Evaluate commuting choices to lower urban carbon emissions and pollution.</p>
+                    </div>
+                    <button onclick="launchMission(5)" class="w-full btn-primary py-2 rounded-lg text-xs font-bold uppercase tracking-wider">Launch Mission</button>
+                </div>
+
+                <!-- Unlock Letter 2 Action Card -->
+                <div class="glass-card rounded-xl p-4 flex flex-col justify-between border-green/50 bg-green/10 relative overflow-hidden">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-mono text-green bg-green/20 px-2.5 py-1 rounded-full border border-green/30">TIMELINE REVISION</span>
+                        </div>
+                        <h3 class="font-bold text-cream text-base mb-1">Jennifer's 2nd Letter</h3>
+                        <p class="text-xs text-mint/80 mb-4">Unlocks automatically after completing 4 distinct environmental missions.</p>
+                    </div>
+                    <button id="unlockLetter2Btn" onclick="goToScreen(6)" disabled class="w-full bg-gray-700/50 text-gray-400 cursor-not-allowed border border-gray-600 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all">
+                        <i class="fas fa-lock mr-1"></i> Locked (Need 4)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= MISSION INTERFACE CONTAINER ================= -->
+        <div id="missionScreen" class="screen absolute inset-0 hidden flex-col p-4 z-20 bg-navy">
+            <!-- Top Mission Bar -->
+            <div class="flex justify-between items-center pb-2 border-b border-cyan/30 mb-2">
+                <div class="flex items-center gap-3">
+                    <button onclick="returnToMissionBoard()" class="text-cyan hover:text-mint font-bold text-xs uppercase tracking-wider flex items-center gap-1 bg-teal/40 border border-cyan/30 px-3 py-1.5 rounded-lg">
+                        <i class="fas fa-arrow-left"></i> Board
+                    </button>
+                    <h3 id="activeMissionTitle" class="font-bold text-cream text-base sm:text-lg">Mission Name</h3>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="activeMissionProgress" class="text-xs font-mono text-cyan bg-teal/50 px-3 py-1 rounded-full border border-cyan/30">0% Complete</span>
+                </div>
+            </div>
+
+            <!-- MISSION CANVAS & INTERACTIVE WORKSPACE -->
+            <div class="relative flex-1 w-full rounded-xl overflow-hidden bg-black/40 border border-cyan/30 flex items-center justify-center">
+                <canvas id="missionCanvas" class="w-full h-full block"></canvas>
+                
+                <!-- Overlay DOM UI for Mission 4 Waste Sorting -->
+                <div id="mission4Overlay" class="absolute inset-0 hidden p-4 flex flex-col justify-between pointer-events-none">
+                    <div class="text-center bg-navy/80 backdrop-blur-md border border-cyan/30 rounded-xl p-2 max-w-md mx-auto pointer-events-auto">
+                        <p class="text-xs text-mint">Click or drag items to their correct waste bins below.</p>
+                    </div>
+                    
+                    <!-- Items Pool -->
+                    <div id="trashItemsPool" class="flex flex-wrap justify-center gap-3 my-auto p-4 pointer-events-auto"></div>
+
+                    <!-- Bins Container -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pointer-events-auto">
+                        <div id="bin-paper" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'paper')" onclick="selectBin('paper')" class="bin-target bg-blue-900/40 border-2 border-blue-400/50 rounded-xl p-3 text-center transition-all hover:bg-blue-800/50">
+                            <i class="fas fa-newspaper text-blue-300 text-2xl mb-1"></i>
+                            <div class="font-bold text-xs text-blue-200 uppercase">1. Paper</div>
+                        </div>
+                        <div id="bin-plastic" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'plastic')" onclick="selectBin('plastic')" class="bin-target bg-yellow-900/40 border-2 border-yellow-400/50 rounded-xl p-3 text-center transition-all hover:bg-yellow-800/50">
+                            <i class="fas fa-wine-bottle text-yellow-300 text-2xl mb-1"></i>
+                            <div class="font-bold text-xs text-yellow-200 uppercase">2. Plastic</div>
+                        </div>
+                        <div id="bin-glass" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'glass')" onclick="selectBin('glass')" class="bin-target bg-teal-900/40 border-2 border-teal-400/50 rounded-xl p-3 text-center transition-all hover:bg-teal-800/50">
+                            <i class="fas fa-glass-martini-alt text-teal-300 text-2xl mb-1"></i>
+                            <div class="font-bold text-xs text-teal-200 uppercase">3. Glass / Metal</div>
+                        </div>
+                        <div id="bin-organic" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'organic')" onclick="selectBin('organic')" class="bin-target bg-green-900/40 border-2 border-green-400/50 rounded-xl p-3 text-center transition-all hover:bg-green-800/50">
+                            <i class="fas fa-apple-alt text-green-300 text-2xl mb-1"></i>
+                            <div class="font-bold text-xs text-green-200 uppercase">4. Organic</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overlay DOM UI for Mission 5 Transportation -->
+                <div id="mission5Overlay" class="absolute inset-0 hidden p-4 flex flex-col justify-between pointer-events-none">
+                    <div class="bg-navy/90 backdrop-blur-md p-3 rounded-xl border border-cyan/30 text-center max-w-lg mx-auto pointer-events-auto">
+                        <h4 class="font-bold text-cream text-sm mb-1">Select Eco-Friendly Daily Travel Mode</h4>
+                        <p class="text-xs text-mint/80">Choose how to navigate the city to lower atmospheric carbon intensity.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pointer-events-auto max-w-2xl mx-auto w-full">
+                        <button onclick="selectTransit('walk')" class="glass-card p-3 rounded-xl hover:border-cyan text-center flex flex-col items-center gap-1">
+                            <i class="fas fa-walking text-2xl text-green"></i>
+                            <span class="font-bold text-xs text-cream">Walking</span>
+                            <span class="text-[10px] text-green font-mono">0 g CO2/km</span>
+                        </button>
+                        <button onclick="selectTransit('bike')" class="glass-card p-3 rounded-xl hover:border-cyan text-center flex flex-col items-center gap-1">
+                            <i class="fas fa-bicycle text-2xl text-cyan"></i>
+                            <span class="font-bold text-xs text-cream">Cycling</span>
+                            <span class="text-[10px] text-cyan font-mono">0 g CO2/km</span>
+                        </button>
+                        <button onclick="selectTransit('bus')" class="glass-card p-3 rounded-xl hover:border-cyan text-center flex flex-col items-center gap-1">
+                            <i class="fas fa-bus text-2xl text-yellow-400"></i>
+                            <span class="font-bold text-xs text-cream">Public Bus</span>
+                            <span class="text-[10px] text-yellow-300 font-mono">35 g CO2/km</span>
+                        </button>
+                        <button onclick="selectTransit('car')" class="glass-card p-3 rounded-xl hover:border-cyan text-center flex flex-col items-center gap-1 opacity-70">
+                            <i class="fas fa-car text-2xl text-red-400"></i>
+                            <span class="font-bold text-xs text-cream">Solo Car</span>
+                            <span class="text-[10px] text-red-400 font-mono">192 g CO2/km</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Mission Instructions & Feedback -->
+            <div id="missionInstructionBox" class="mt-2 bg-teal/30 border border-cyan/30 p-2.5 rounded-xl text-xs text-mint flex justify-between items-center">
+                <span id="missionGuideText"><i class="fas fa-info-circle text-cyan mr-1"></i> Perform actions directly on canvas.</span>
+                <span id="missionSafetyNote" class="text-[11px] text-yellow-300 hidden font-mono"><i class="fas fa-shield-alt mr-1"></i> Safety: Real drain maintenance requires protective tools and adult supervision.</span>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 6: JENNIFER'S SECOND LETTER ================= -->
+        <div id="screen6" class="screen absolute inset-0 hidden flex-col p-6 sm:p-10 z-10 bg-navy/95 overflow-y-auto">
+            <div class="max-w-2xl mx-auto my-auto w-full">
+                <div class="flex items-center justify-between border-b border-green/30 pb-3 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-green animate-ping"></div>
+                        <span class="text-xs font-mono text-green uppercase tracking-wider">UPDATED TIMELINE TRANSMISSION // 2050 A.D.</span>
+                    </div>
+                    <span class="text-xs font-mono text-mint/50">TIMELINE REVISED</span>
+                </div>
+
+                <div class="glass-card p-6 sm:p-8 rounded-2xl relative border-green/40 text-cream leading-relaxed space-y-4 shadow-2xl">
+                    <div class="absolute -top-3 right-6 bg-green text-navy font-bold font-mono text-[10px] px-3 py-0.5 rounded-full uppercase">
+                        Sender: Jennifer
+                    </div>
+
+                    <p class="text-sm sm:text-base italic text-green font-mono">
+                        "Dear <span class="playerNameSpan font-bold text-cream">Traveler</span>,"
+                    </p>
+
+                    <p class="text-xs sm:text-sm text-mint/90 leading-relaxed">
+                        I am writing to you again from 2050—and I can hardly believe the view from my window! The skies are clearer, and the air smells crisp and fresh.
+                    </p>
+
+                    <p id="jenniferLetterAchievements" class="text-xs sm:text-sm text-mint/90 leading-relaxed bg-teal/20 p-3 rounded-xl border border-cyan/20">
+                        <!-- Dynamic list of accomplishments injected via JS -->
+                    </p>
+
+                    <p class="text-xs sm:text-sm text-mint/90 leading-relaxed">
+                        The river near the arched bridge is flowing once more with clean water. Because people in your time began sorting waste, clearing drains, and planting trees together, our community in 2050 has transformed into a resilient ecosystem.
+                    </p>
+
+                    <p class="text-xs sm:text-sm text-mint/90 leading-relaxed">
+                        Thank you for proving that the future is not predetermined—it is shaped by every action we take today.
+                    </p>
+                </div>
+
+                <div class="text-center mt-6">
+                    <button onclick="goToScreen(7)" class="btn-primary font-bold px-8 py-3 rounded-full uppercase tracking-wider text-sm inline-flex items-center gap-2">
+                        <span>Witness Restored Future</span>
+                        <i class="fas fa-globe-americas"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 7: POSITIVE FUTURE SCENE ================= -->
+        <div id="screen7" class="screen absolute inset-0 hidden flex-col p-4 sm:p-8 z-10 bg-navy">
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <span class="text-xs font-mono text-green uppercase tracking-wider">RESTORED TIMELINE // 2050 A.D.</span>
+                    <h2 class="text-xl font-extrabold text-cream">A Flourishing Future Scene</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-mint/70">Drag slider to compare changes</span>
+                </div>
+            </div>
+
+            <!-- Future Canvas Environment -->
+            <div class="relative flex-1 rounded-xl overflow-hidden border-2 border-green/40 shadow-2xl">
+                <canvas id="futureCanvas" class="w-full h-full block"></canvas>
+            </div>
+
+            <div class="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="text-xs text-mint/80 italic max-w-xl">
+                    "The river flows clean, trees flourish along textured banks, and urban life thrives in harmony with nature."
+                </div>
+                <button onclick="goToScreen(8)" class="btn-primary font-bold px-6 py-2.5 rounded-full uppercase tracking-wider text-xs inline-flex items-center gap-2 shrink-0">
+                    <span>View Final Scoreboard</span>
+                    <i class="fas fa-award"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= SCREEN 8: FINAL SCOREBOARD & CONCLUSION ================= -->
+        <div id="screen8" class="screen absolute inset-0 hidden flex-col p-6 sm:p-10 z-10 bg-navy/95 overflow-y-auto">
+            <div class="max-w-3xl mx-auto my-auto w-full space-y-6 text-center">
+                
+                <div>
+                    <span class="text-xs font-mono text-cyan uppercase tracking-widest">TIMELINE RESTORATION COMPLETE</span>
+                    <h1 class="text-3xl sm:text-5xl font-black text-cream glow-text mt-1">THE FUTURE IS NOT WRITTEN YET.</h1>
+                    <p class="text-sm text-mint/80 mt-2 max-w-lg mx-auto italic">
+                        "Every choice matters. A better future begins with the actions we take together."
+                    </p>
+                </div>
+
+                <!-- Scoreboard Card -->
+                <div class="glass-card p-6 rounded-2xl border-cyan/40 shadow-2xl text-left space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 border-b border-cyan/20 gap-2">
+                        <div>
+                            <span class="text-[10px] font-mono text-mint/60 uppercase">ECO HERO PROFILING</span>
+                            <h3 id="scoreboardPlayerName" class="text-xl font-bold text-cyan">Player Name</h3>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-teal/50 border border-cyan/30 px-3 py-1 rounded-xl text-center">
+                                <span class="text-[10px] text-mint/60 block font-mono">TOTAL ECO SCORE</span>
+                                <span id="finalScoreText" class="text-2xl font-black text-green font-mono">0 PTS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div>
+                            <h4 class="font-bold text-cream mb-2 uppercase font-mono text-[11px] text-cyan">Completed Missions</h4>
+                            <ul id="scoreboardMissionsList" class="space-y-1 text-mint/80">
+                                <!-- JS Injected -->
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-cream mb-2 uppercase font-mono text-[11px] text-cyan">SDGs Impacted</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-green/20 border border-green/40 text-mint rounded">SDG 13: Climate Action</span>
+                                <span class="px-2 py-1 bg-cyan/20 border border-cyan/40 text-cyan rounded">SDG 6: Clean Water</span>
+                                <span class="px-2 py-1 bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 rounded">SDG 11: Sustainable Cities</span>
+                                <span class="px-2 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded">SDG 15: Life on Land</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Project Credentials -->
+                <div class="bg-teal/20 border border-cyan/20 p-3 rounded-xl text-xs font-mono text-mint/70 flex flex-wrap justify-between items-center gap-2">
+                    <span>GAME: 2050 LETTERS FROM THE FUTURE</span>
+                    <span>DEVELOPMENT TEAM: TENSOR TITANS</span>
+                    <span>PRIMARY SDG: SDG 13</span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-center gap-4 pt-2">
+                    <button onclick="resetAndReplay()" class="btn-primary font-bold px-8 py-3 rounded-full uppercase tracking-wider text-sm flex items-center gap-2">
+                        <i class="fas fa-redo"></i>
+                        <span>Replay Game</span>
+                    </button>
+                    <button onclick="goToScreen(1)" class="bg-teal/40 hover:bg-teal/60 border border-cyan/30 text-cream font-bold px-8 py-3 rounded-full uppercase tracking-wider text-sm flex items-center gap-2 transition-all">
+                        <i class="fas fa-home"></i>
+                        <span>Title Screen</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUDIO ENGINE & GAME LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. GAME STATE MANAGEMENT
+           ========================================================================== */
+        const gameState = {
+            playerName: "Traveler",
+            score: 0,
+            completedMissions: new Set(),
+            currentMission: null,
+            audioMuted: false,
+            volume: 0.5,
+            missionData: {
+                1: { title: "River Restoration", score: 250, done: false },
+                2: { title: "Drain Unclogging", score: 250, done: false },
+                3: { title: "Tree Planting & Growth", score: 250, done: false },
+                4: { title: "Waste Classification", score: 250, done: false },
+                5: { title: "Sustainable Transportation", score: 250, done: false }
+            }
+        };
+
+        /* ==========================================================================
+           2. WEB AUDIO API SYNTHESIZER ENGINE (No External MP3 files needed)
+           ========================================================================== */
+        let audioCtx = null;
+        let bgMusicOsc = null;
+        let bgMusicGain = null;
+        let isMusicPlaying = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (gameState.audioMuted) return;
+            initAudio();
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                gain.gain.setValueAtTime(0.2 * gameState.volume, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'pickup') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.12);
+                gain.gain.setValueAtTime(0.3 * gameState.volume, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'splash') {
+                // Noise buffer simulation
+                const bufferSize = audioCtx.sampleRate * 0.2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1000, now);
+                filter.frequency.linearRampToValueAtTime(200, now + 0.2);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.gain.setValueAtTime(0.3 * gameState.volume, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                noise.start(now);
+            } else if (type === 'complete') {
+                // Arpeggio
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.type = 'sine';
+                    noteOsc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                    noteGain.gain.setValueAtTime(0.25 * gameState.volume, now + idx * 0.08);
+                    noteGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.2);
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.start(now + idx * 0.08);
+                    noteOsc.stop(now + idx * 0.08 + 0.2);
+                });
+            }
+        }
+
+        function toggleAudio() {
+            gameState.audioMuted = !gameState.audioMuted;
+            const icon = document.getElementById('soundIcon');
+            if (gameState.audioMuted) {
+                icon.className = 'fas fa-volume-mute text-red-400';
+            } else {
+                icon.className = 'fas fa-volume-up text-cyan';
+                playSound('click');
+            }
+        }
+
+        function adjustVolume(val) {
+            gameState.volume = parseFloat(val);
+        }
+
+        /* ==========================================================================
+           3. SCREEN NAVIGATION & FLOW CONTROL
+           ========================================================================== */
+        function goToScreen(screenNum) {
+            playSound('click');
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.add('hidden');
+                s.classList.remove('flex');
+            });
+
+            const target = document.getElementById(`screen${screenNum}`);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('flex');
+            }
+
+            // Screen Specific Actions
+            if (screenNum === 1) renderTitleBg();
+            if (screenNum === 5) updateMissionBoardUI();
+            if (screenNum === 6) updateJenniferLetter2UI();
+            if (screenNum === 7) renderFutureCanvas();
+            if (screenNum === 8) renderScoreboardUI();
+        }
+
+        function handleNameSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('playerNameInput').value.trim();
+            if (!input) {
+                document.getElementById('nameError').classList.remove('hidden');
+                return;
+            }
+            gameState.playerName = input;
+            document.querySelectorAll('.playerNameSpan').forEach(el => el.textContent = input);
+            goToScreen(4);
+        }
+
+        /* ==========================================================================
+           4. TITLE SCREEN PROCEDURAL CANVAS ANIMATION
+           ========================================================================== */
+        function renderTitleBg() {
+            const canvas = document.getElementById('titleBgCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            let time = 0;
+            function animate() {
+                if (document.getElementById('screen1').classList.contains('hidden')) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Gradient Background
+                const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                bgGrad.addColorStop(0, '#101B2D');
+                bgGrad.addColorStop(0.6, '#123F46');
+                bgGrad.addColorStop(1, '#0b1524');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // River Water Waves
+                ctx.fillStyle = 'rgba(98, 214, 214, 0.15)';
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height * 0.75);
+                for (let x = 0; x < canvas.width; x += 20) {
+                    ctx.lineTo(x, canvas.height * 0.75 + Math.sin(x * 0.01 + time) * 15);
+                }
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.lineTo(0, canvas.height);
+                ctx.fill();
+
+                // Arched Bridge Contour
+                ctx.strokeStyle = '#62D6D6';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, canvas.height * 0.7, 180, Math.PI, 0, false);
+                ctx.stroke();
+
+                time += 0.03;
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        /* ==========================================================================
+           5. MISSION SELECTION & PROGRESS LOGIC
+           ========================================================================== */
+        function updateMissionBoardUI() {
+            const doneCount = gameState.completedMissions.size;
+            document.getElementById('missionProgressText').textContent = `${doneCount} / 4 Required`;
+            document.getElementById('playerPointsText').textContent = gameState.score;
+
+            for (let i = 1; i <= 5; i++) {
+                const badge = document.getElementById(`m${i}Badge`);
+                if (gameState.completedMissions.has(i)) {
+                    badge.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-green/20 text-mint border border-green/40";
+                    badge.textContent = "COMPLETED";
+                }
+            }
+
+            const unlockBtn = document.getElementById('unlockLetter2Btn');
+            if (doneCount >= 4) {
+                unlockBtn.disabled = false;
+                unlockBtn.className = "w-full btn-primary py-2 rounded-lg text-xs font-bold uppercase tracking-wider animate-bounce";
+                unlockBtn.innerHTML = `<i class="fas fa-envelope-open-text mr-1"></i> Open Jennifer's 2nd Letter`;
+            }
+        }
+
+        function launchMission(mId) {
+            playSound('click');
+            gameState.currentMission = mId;
+            document.querySelectorAll('.screen').forEach(s => { s.classList.add('hidden'); s.classList.remove('flex'); });
+
+            const mScreen = document.getElementById('missionScreen');
+            mScreen.classList.remove('hidden');
+            mScreen.classList.add('flex');
+
+            document.getElementById('mission4Overlay').classList.add('hidden');
+            document.getElementById('mission5Overlay').classList.add('hidden');
+            document.getElementById('missionSafetyNote').classList.add('hidden');
+
+            const mData = gameState.missionData[mId];
+            document.getElementById('activeMissionTitle').textContent = `Mission ${mId}: ${mData.title}`;
+            document.getElementById('activeMissionProgress').textContent = gameState.completedMissions.has(mId) ? "100% Complete" : "0% Complete";
+
+            if (mId === 1) initMission1();
+            if (mId === 2) initMission2();
+            if (mId === 3) initMission3();
+            if (mId === 4) initMission4();
+            if (mId === 5) initMission5();
+        }
+
+        function completeMission(mId) {
+            if (!gameState.completedMissions.has(mId)) {
+                gameState.completedMissions.add(mId);
+                gameState.score += gameState.missionData[mId].score;
+                playSound('complete');
+            }
+            document.getElementById('activeMissionProgress').textContent = "100% Complete";
+            document.getElementById('missionGuideText').innerHTML = `<span class="text-green font-bold"><i class="fas fa-check-circle"></i> Mission Accomplished! (+250 Eco Points)</span>`;
+        }
+
+        function returnToMissionBoard() {
+            goToScreen(5);
+        }
+
+        /* ==========================================================================
+           6. MISSION 1: RIVER RESTORATION (Interactive Canvas Trash Pickup)
+           ========================================================================== */
+        let m1State = { trashList: [], cleanedCount: 0, totalTrash: 6 };
+
+        function initMission1() {
+            const canvas = document.getElementById('missionCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            document.getElementById('missionGuideText').innerHTML = `<i class="fas fa-hand-pointer text-cyan mr-1"></i> Click on all floating plastics and trash to clean the river.`;
+
+            m1State.trashList = [
+                { x: canvas.width * 0.2, y: canvas.height * 0.6, type: 'bottle', id: 1 },
+                { x: canvas.width * 0.35, y: canvas.height * 0.75, type: 'bag', id: 2 },
+                { x: canvas.width * 0.5, y: canvas.height * 0.65, type: 'can', id: 3 },
+                { x: canvas.width * 0.68, y: canvas.height * 0.8, type: 'newspaper', id: 4 },
+                { x: canvas.width * 0.8, y: canvas.height * 0.62, type: 'bottle', id: 5 },
+                { x: canvas.width * 0.42, y: canvas.height * 0.82, type: 'bag', id: 6 }
+            ];
+            m1State.cleanedCount = gameState.completedMissions.has(1) ? 6 : 0;
+
+            function draw() {
+                if (gameState.currentMission !== 1) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // River Water Clarity Transitions from Murky (#3d321d) to Cyan Teal
+                const ratio = m1State.cleanedCount / m1State.totalTrash;
+                const r = Math.round(61 * (1 - ratio) + 18 * ratio);
+                const g = Math.round(50 * (1 - ratio) + 63 * ratio);
+                const b = Math.round(29 * (1 - ratio) + 70 * ratio);
+
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Riverbanks
+                ctx.fillStyle = '#123F46';
+                ctx.fillRect(0, 0, canvas.width, canvas.height * 0.3);
+
+                // Arched Bridge
+                ctx.strokeStyle = '#62D6D6';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, canvas.height * 0.3, 120, Math.PI, 0, false);
+                ctx.stroke();
+
+                // Draw Trash Objects
+                m1State.trashList.forEach(item => {
+                    ctx.save();
+                    ctx.translate(item.x, item.y);
+                    if (item.type === 'bottle') {
+                        ctx.fillStyle = '#C6E8D0';
+                        ctx.fillRect(-6, -12, 12, 24);
+                        ctx.fillStyle = '#62D6D6';
+                        ctx.fillRect(-3, -16, 6, 4);
+                    } else if (item.type === 'bag') {
+                        ctx.fillStyle = '#e2e8f0';
+                        ctx.beginPath();
+                        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (item.type === 'can') {
+                        ctx.fillStyle = '#cbd5e1';
+                        ctx.fillRect(-8, -10, 16, 20);
+                    } else {
+                        ctx.fillStyle = '#f1f5f9';
+                        ctx.fillRect(-10, -8, 20, 16);
+                    }
+                    ctx.restore();
+                });
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+
+            canvas.onclick = (e) => {
+                if (m1State.cleanedCount >= m1State.totalTrash) return;
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+
+                m1State.trashList.forEach((item, index) => {
+                    const dist = Math.hypot(item.x - mx, item.y - my);
+                    if (dist < 25) {
+                        m1State.trashList.splice(index, 1);
+                        m1State.cleanedCount++;
+                        playSound('pickup');
+                        document.getElementById('activeMissionProgress').textContent = `${Math.round((m1State.cleanedCount / m1State.totalTrash) * 100)}% Complete`;
+                        if (m1State.cleanedCount >= m1State.totalTrash) {
+                            completeMission(1);
+                        }
+                    }
+                });
+            };
+        }
+
+        /* ==========================================================================
+           7. MISSION 2: DRAIN UNCLOGGING (Storm Grate Debris Removal)
+           ========================================================================== */
+        let m2State = { debris: [], cleared: 0, total: 5 };
+
+        function initMission2() {
+            const canvas = document.getElementById('missionCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            document.getElementById('missionSafetyNote').classList.remove('hidden');
+            document.getElementById('missionGuideText').innerHTML = `<i class="fas fa-broom text-cyan mr-1"></i> Clear all mud, leaves, and trash blocking the storm drain grate.`;
+
+            m2State.debris = [
+                { x: canvas.width * 0.45, y: canvas.height * 0.45, radius: 25 },
+                { x: canvas.width * 0.52, y: canvas.height * 0.52, radius: 20 },
+                { x: canvas.width * 0.48, y: canvas.height * 0.58, radius: 22 },
+                { x: canvas.width * 0.55, y: canvas.height * 0.42, radius: 18 },
+                { x: canvas.width * 0.42, y: canvas.height * 0.52, radius: 24 }
+            ];
+            m2State.cleared = gameState.completedMissions.has(2) ? 5 : 0;
+
+            function draw() {
+                if (gameState.currentMission !== 2) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Concrete Ground Frame
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Storm Drain Grate Box
+                const gx = canvas.width * 0.35;
+                const gy = canvas.height * 0.35;
+                const gw = canvas.width * 0.3;
+                const gh = canvas.height * 0.3;
+
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(gx, gy, gw, gh);
+
+                // Grate Metal Bars
+                ctx.strokeStyle = '#64748b';
+                ctx.lineWidth = 6;
+                for (let x = gx + 15; x < gx + gw; x += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, gy);
+                    ctx.lineTo(x, gy + gh);
+                    ctx.stroke();
+                }
+
+                // Water Flow Simulation through Grate as debris clears
+                if (m2State.cleared > 0) {
+                    ctx.fillStyle = 'rgba(98, 214, 214, 0.4)';
+                    ctx.fillRect(gx, gy + (gh * 0.2), gw * (m2State.cleared / m2State.total), gh * 0.6);
+                }
+
+                // Render Debris
+                m2State.debris.forEach(d => {
+                    ctx.fillStyle = '#78350f';
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+
+            canvas.onclick = (e) => {
+                if (m2State.cleared >= m2State.total) return;
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+
+                m2State.debris.forEach((d, idx) => {
+                    if (Math.hypot(d.x - mx, d.y - my) < d.radius) {
+                        m2State.debris.splice(idx, 1);
+                        m2State.cleared++;
+                        playSound('splash');
+                        document.getElementById('activeMissionProgress').textContent = `${Math.round((m2State.cleared / m2State.total) * 100)}% Complete`;
+                        if (m2State.cleared >= m2State.total) {
+                            completeMission(2);
+                        }
+                    }
+                });
+            };
+        }
+
+        /* ==========================================================================
+           8. MISSION 3: TREE PLANTING AND GROWTH (Dig -> Plant -> Water Loop)
+           ========================================================================== */
+        let m3State = { spots: [] };
+
+        function initMission3() {
+            const canvas = document.getElementById('missionCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            document.getElementById('missionGuideText').innerHTML = `<i class="fas fa-seedling text-cyan mr-1"></i> Click planting spots in order: Dig Hole -> Plant Sapling -> Water Tree.`;
+
+            const isDone = gameState.completedMissions.has(3);
+            m3State.spots = [
+                { x: canvas.width * 0.18, y: canvas.height * 0.65, stage: isDone ? 3 : 0 },
+                { x: canvas.width * 0.34, y: canvas.height * 0.65, stage: isDone ? 3 : 0 },
+                { x: canvas.width * 0.50, y: canvas.height * 0.65, stage: isDone ? 3 : 0 },
+                { x: canvas.width * 0.66, y: canvas.height * 0.65, stage: isDone ? 3 : 0 },
+                { x: canvas.width * 0.82, y: canvas.height * 0.65, stage: isDone ? 3 : 0 }
+            ];
+
+            function draw() {
+                if (gameState.currentMission !== 3) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Soil Garden Bed
+                ctx.fillStyle = '#123F46';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0f2b30';
+                ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+
+                // Render Planting Spots
+                m3State.spots.forEach((spot, idx) => {
+                    // Hole / Spot Target
+                    ctx.fillStyle = spot.stage > 0 ? '#451a03' : '#1e3a8a';
+                    ctx.beginPath();
+                    ctx.ellipse(spot.x, spot.y + 10, 25, 10, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Tree Growth Stages
+                    if (spot.stage === 1) { // Planted
+                        ctx.fillStyle = '#15803d';
+                        ctx.fillRect(spot.x - 2, spot.y - 15, 4, 20);
+                        ctx.beginPath();
+                        ctx.arc(spot.x, spot.y - 18, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (spot.stage === 2) { // Watered / Sapling
+                        ctx.fillStyle = '#b45309';
+                        ctx.fillRect(spot.x - 4, spot.y - 35, 8, 40);
+                        ctx.fillStyle = '#16a34a';
+                        ctx.beginPath();
+                        ctx.arc(spot.x, spot.y - 42, 18, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (spot.stage === 3) { // Full Tree
+                        ctx.fillStyle = '#78350f';
+                        ctx.fillRect(spot.x - 6, spot.y - 55, 12, 60);
+                        ctx.fillStyle = '#79B879';
+                        ctx.beginPath();
+                        ctx.arc(spot.x, spot.y - 65, 30, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+
+            canvas.onclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+
+                m3State.spots.forEach(spot => {
+                    if (Math.hypot(spot.x - mx, spot.y - my) < 35) {
+                        if (spot.stage < 3) {
+                            spot.stage++;
+                            playSound('pickup');
+                            checkM3Progress();
+                        }
+                    }
+                });
+            };
+        }
+
+        function checkM3Progress() {
+            const completedSpots = m3State.spots.filter(s => s.stage === 3).length;
+            document.getElementById('activeMissionProgress').textContent = `${Math.round((completedSpots / 5) * 100)}% Complete`;
+            if (completedSpots === 5) {
+                completeMission(3);
+            }
+        }
+
+        /* ==========================================================================
+           9. MISSION 4: WASTE CLASSIFICATION (Categorized Sorting)
+           ========================================================================== */
+        let m4State = { items: [], sortedCount: 0 };
+
+        function initMission4() {
+            document.getElementById('mission4Overlay').classList.remove('hidden');
+            document.getElementById('missionGuideText').innerHTML = `<i class="fas fa-boxes text-cyan mr-1"></i> Classify all waste items into their respective bins.`;
+
+            const pool = document.getElementById('trashItemsPool');
+            pool.innerHTML = '';
+
+            const itemsData = [
+                { id: 'i1', name: 'Newspaper', cat: 'paper', icon: 'fa-newspaper text-blue-300' },
+                { id: 'i2', name: 'Plastic Bottle', cat: 'plastic', icon: 'fa-wine-bottle text-yellow-300' },
+                { id: 'i3', name: 'Glass Jar', cat: 'glass', icon: 'fa-glass-martini-alt text-teal-300' },
+                { id: 'i4', name: 'Apple Core', cat: 'organic', icon: 'fa-apple-alt text-green-300' },
+                { id: 'i5', name: 'Cardboard Box', cat: 'paper', icon: 'fa-box text-blue-300' },
+                { id: 'i6', name: 'Metal Can', cat: 'glass', icon: 'fa-box-tissue text-teal-300' }
+            ];
+
+            m4State.items = itemsData;
+            m4State.sortedCount = gameState.completedMissions.has(4) ? 6 : 0;
+
+            if (m4State.sortedCount === 6) {
+                pool.innerHTML = `<span class="text-green font-bold text-sm">All items correctly sorted!</span>`;
+                return;
+            }
+
+            itemsData.forEach(item => {
+                const el = document.createElement('div');
+                el.id = item.id;
+                el.draggable = true;
+                el.dataset.category = item.cat;
+                el.ondragstart = (e) => e.dataTransfer.setData('text/plain', item.id);
+                el.onclick = () => selectItemForSorting(item);
+                el.className = "bg-navy/90 border border-cyan/40 hover:border-cyan px-3 py-2 rounded-xl flex items-center gap-2 cursor-pointer transition-all shadow-md";
+                el.innerHTML = `<i class="fas ${item.icon}"></i><span class="text-xs text-cream font-bold">${item.name}</span>`;
+                pool.appendChild(el);
+            });
+        }
+
+        let selectedM4Item = null;
+        function selectItemForSorting(item) {
+            selectedM4Item = item;
+            playSound('click');
+            document.getElementById('missionGuideText').innerHTML = `<span class="text-yellow-300">Selected: ${item.name}. Click target bin to sort.</span>`;
+        }
+
+        function selectBin(targetCat) {
+            if (!selectedM4Item) return;
+            if (selectedM4Item.cat === targetCat) {
+                playSound('pickup');
+                document.getElementById(selectedM4Item.id)?.remove();
+                m4State.sortedCount++;
+                selectedM4Item = null;
+                updateM4Progress();
+            } else {
+                playSound('click');
+                document.getElementById('missionGuideText').innerHTML = `<span class="text-red-400">Incorrect bin! Try again.</span>`;
+            }
+        }
+
+        function allowDrop(e) { e.preventDefault(); }
+        function handleDrop(e, targetCat) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain');
+            const item = m4State.items.find(i => i.id === id);
+            if (item && item.cat === targetCat) {
+                playSound('pickup');
+                document.getElementById(id)?.remove();
+                m4State.sortedCount++;
+                updateM4Progress();
+            } else {
+                playSound('click');
+            }
+        }
+
+        function updateM4Progress() {
+            document.getElementById('activeMissionProgress').textContent = `${Math.round((m4State.sortedCount / 6) * 100)}% Complete`;
+            if (m4State.sortedCount >= 6) {
+                completeMission(4);
+            }
+        }
+
+        /* ==========================================================================
+           10. MISSION 5: SUSTAINABLE TRANSPORTATION
+           ========================================================================== */
+        function initMission5() {
+            document.getElementById('mission5Overlay').classList.remove('hidden');
+            document.getElementById('missionGuideText').innerHTML = `<i class="fas fa-bus text-cyan mr-1"></i> Select a transit option to evaluate environmental impact.`;
+        }
+
+        function selectTransit(type) {
+            playSound('click');
+            if (type === 'walk' || type === 'bike' || type === 'bus') {
+                completeMission(5);
+                document.getElementById('missionGuideText').innerHTML = `<span class="text-green font-bold"><i class="fas fa-leaf"></i> Excellent choice! Low/Zero carbon footprint mode selected.</span>`;
+            } else {
+                document.getElementById('missionGuideText').innerHTML = `<span class="text-yellow-300"><i class="fas fa-exclamation-triangle"></i> Solo car transit emits high greenhouse gases. Choose eco-transit!</span>`;
+            }
+        }
+
+        /* ==========================================================================
+           11. SCREEN 6 & 7: JENNIFER'S 2ND LETTER & FUTURE CANVASES
+           ========================================================================== */
+        function updateJenniferLetter2UI() {
+            const list = document.getElementById('jenniferLetterAchievements');
+            let html = `<strong>Timeline Interventions Achieved:</strong><ul class="list-disc list-inside mt-1 space-y-1">`;
+            
+            gameState.completedMissions.forEach(mId => {
+                html += `<li>${gameState.missionData[mId].title}</li>`;
+            });
+            html += `</ul>`;
+            list.innerHTML = html;
+        }
+
+        function renderFutureCanvas() {
+            const canvas = document.getElementById('futureCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Vibrant Clean Sky Gradient
+            const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            sky.addColorStop(0, '#101B2D');
+            sky.addColorStop(0.5, '#123F46');
+            sky.addColorStop(1, '#155e75');
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Clean Crystal River
+            ctx.fillStyle = '#62D6D6';
+            ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+
+            // Restored Arched Bridge
+            ctx.strokeStyle = '#C6E8D0';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height * 0.6, 160, Math.PI, 0, false);
+            ctx.stroke();
+
+            // Lush Trees along banks
+            for (let x = 50; x < canvas.width; x += 120) {
+                ctx.fillStyle = '#78350f';
+                ctx.fillRect(x - 5, canvas.height * 0.6 - 40, 10, 40);
+                ctx.fillStyle = '#79B879';
+                ctx.beginPath();
+                ctx.arc(x, canvas.height * 0.6 - 50, 25, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        /* ==========================================================================
+           12. SCREEN 8: SCOREBOARD & REPLAY SYSTEM
+           ========================================================================== */
+        function renderScoreboardUI() {
+            document.getElementById('scoreboardPlayerName').textContent = gameState.playerName;
+            document.getElementById('finalScoreText').textContent = `${gameState.score} PTS`;
+
+            const list = document.getElementById('scoreboardMissionsList');
+            list.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const isDone = gameState.completedMissions.has(i);
+                const li = document.createElement('li');
+                li.className = "flex items-center gap-2";
+                li.innerHTML = isDone 
+                    ? `<i class="fas fa-check-circle text-green"></i> <span>Mission ${i}: ${gameState.missionData[i].title} (+250)</span>`
+                    : `<i class="fas fa-times-circle text-gray-500"></i> <span class="text-gray-500">Mission ${i}: ${gameState.missionData[i].title} (0)</span>`;
+                list.appendChild(li);
+            }
+        }
+
+        function resetAndReplay() {
+            gameState.score = 0;
+            gameState.completedMissions.clear();
+            for (let i = 1; i <= 5; i++) gameState.missionData[i].done = false;
+            goToScreen(1);
+        }
+
+        // Initialize Title Screen on Load
+        window.onload = () => {
+            renderTitleBg();
+        };
+    </script>
+</body>
+</html>
